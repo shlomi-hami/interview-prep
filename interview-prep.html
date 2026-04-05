@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הכנה לראיון — גב אל גב</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: linear-gradient(160deg, #faf7f2 0%, #f0e8d8 100%);
+    min-height: 100vh;
+    direction: rtl;
+    padding: 32px 16px;
+    color: #2a1f0e;
+  }
+  .container { max-width: 740px; margin: 0 auto; }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 36px; }
+  .header-sub { font-size: 11px; color: #b09070; letter-spacing: 4px; margin-bottom: 10px; font-family: sans-serif; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #2a1f0e; margin-bottom: 6px; letter-spacing: -0.5px; }
+  .header p { color: #9a8060; font-size: 14px; font-style: italic; margin-bottom: 14px; }
+
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, #8a6030, #b08040);
+    color: #fff; border: none; border-radius: 10px;
+    padding: 14px 32px; font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: sans-serif;
+    box-shadow: 0 4px 16px rgba(139,96,48,0.3);
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { background: #e8dcc8; color: #b09070; box-shadow: none; cursor: not-allowed; }
+  .btn-secondary {
+    background: transparent; color: #9a8060; border: 1px solid #d8c8a8;
+    border-radius: 10px; padding: 12px 24px; font-size: 14px;
+    cursor: pointer; font-family: sans-serif; transition: all 0.2s;
+  }
+  .btn-archive {
+    background: transparent; color: #8a6030; border: 1.5px solid #8a6030;
+    border-radius: 8px; padding: 7px 18px; font-size: 12px; font-weight: 700;
+    cursor: pointer; font-family: sans-serif; transition: all 0.2s;
+  }
+  .btn-archive.active { background: #8a6030; color: #fff; }
+  .btn-copy {
+    background: transparent; color: #b09070; border: 1px solid #d8c8a8;
+    border-radius: 6px; padding: 4px 12px; font-size: 11px;
+    cursor: pointer; font-family: sans-serif; transition: all 0.2s;
+  }
+  .btn-copy.copied { background: #2d6a4f; color: #b7e4c7; border-color: #2d6a4f; }
+
+  /* Card */
+  .card {
+    background: #fff; border: 1px solid #e8dcc8; border-radius: 16px;
+    padding: 28px; margin-bottom: 20px;
+    box-shadow: 0 4px 24px rgba(139,96,48,0.06);
+  }
+
+  /* Steps */
+  .steps { display: flex; justify-content: center; gap: 8px; margin-bottom: 28px; align-items: center; }
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; font-family: sans-serif;
+    transition: all 0.3s; flex-shrink: 0;
+  }
+  .step-circle.active { background: #8a6030; color: #fff; }
+  .step-circle.done { background: #8a6030; color: #fff; }
+  .step-circle.inactive { background: #e8dcc8; color: #b09070; }
+  .step-label { font-size: 12px; font-family: sans-serif; }
+  .step-label.active { color: #2a1f0e; }
+  .step-label.inactive { color: #b09070; }
+  .step-line { width: 24px; height: 1px; background: #d8c8a8; }
+
+  /* Form */
+  .form-grid { display: grid; gap: 18px; }
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  label {
+    display: block; color: #8a7055; font-size: 12px; font-weight: 700;
+    margin-bottom: 6px; letter-spacing: 0.8px; text-transform: uppercase;
+    font-family: sans-serif;
+  }
+  input, select, textarea {
+    width: 100%; background: #f8f6f1; border: 2px solid #e8e0d0;
+    border-radius: 10px; padding: 12px 16px; color: #2a1f0e;
+    font-size: 14px; outline: none; font-family: inherit;
+    transition: border-color 0.2s; direction: rtl;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #8a6030; }
+  input::placeholder, textarea::placeholder { color: #c8b898; }
+  select { cursor: pointer; }
+  textarea { min-height: 80px; resize: vertical; }
+
+  /* Navigation */
+  .nav { display: flex; justify-content: space-between; align-items: center; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .tab {
+    background: #fff; color: #9a8060; border: 1px solid #e8dcc8;
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; font-family: sans-serif; transition: all 0.2s;
+  }
+  .tab.active { background: #8a6030; color: #fff; border-color: #8a6030; }
+
+  /* Section content card */
+  .section-card {
+    background: #fff; border: 1px solid #e8dcc8; border-radius: 14px;
+    padding: 24px; box-shadow: 0 4px 24px rgba(139,96,48,0.06); margin-bottom: 16px;
+  }
+
+  /* Result pieces */
+  .section-title { font-size: 13px; font-weight: 700; color: #8a6030; margin-bottom: 12px; font-family: sans-serif; }
+  .text-block {
+    background: #f8f4ee; border-radius: 10px; padding: 16px 18px;
+    font-size: 14px; color: #2a1f0e; line-height: 1.9; white-space: pre-wrap;
+  }
+  .segment-header {
+    background: #f5efe5; padding: 10px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .segment-time {
+    background: #8a6030; color: #fff; border-radius: 5px;
+    padding: 2px 8px; font-size: 11px; font-family: sans-serif; margin-left: 10px;
+  }
+  .segment-name { font-weight: 700; color: #2a1f0e; font-size: 14px; }
+  .segment-goal { font-size: 12px; color: #9a8060; font-style: italic; }
+  .segment-body { padding: 12px 16px; }
+  .question-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .q-arrow { color: #b09070; font-size: 13px; margin-top: 2px; }
+  .q-text { font-size: 14px; color: #2a1f0e; line-height: 1.6; }
+  .angle-block {
+    background: #f8f4ee; border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 10px; border-right: 3px solid #8a6030;
+    font-size: 14px; color: #2a1f0e; line-height: 1.7;
+  }
+  .caution-block {
+    background: #fff8f0; border: 1px solid #f0d8b0; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 10px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .closing-block {
+    background: #f0f8e8; border: 1px solid #c8dca8; border-radius: 10px; padding: 14px 16px; margin-top: 8px;
+  }
+  .closing-label { font-size: 11px; color: #5a7a3a; font-weight: 700; margin-bottom: 6px; font-family: sans-serif; }
+  .title-option {
+    background: #f8f4ee; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .tag-badge {
+    background: #1a1a3a; color: #8080e0; border-radius: 6px;
+    padding: 4px 10px; font-size: 13px; font-family: sans-serif;
+  }
+  .request-row {
+    display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;
+    background: #fff8f0; border: 1px solid #f0d8b0; border-radius: 8px; padding: 10px 14px;
+  }
+  .num-circle {
+    min-width: 22px; height: 22px; border-radius: 50%;
+    background: #8a6030; color: #fff; display: flex; align-items: center;
+    justify-content: center; font-size: 11px; font-family: sans-serif; flex-shrink: 0;
+  }
+  .opening-block {
+    background: #f8f4ee; border-radius: 10px; padding: 14px 16px;
+    margin-top: 16px; font-size: 14px; color: #4a3520; line-height: 1.9;
+    font-style: italic; border-right: 3px solid #8a6030;
+  }
+  .opening-label { font-size: 11px; color: #8a6030; font-weight: 700; margin-bottom: 6px; font-family: sans-serif; }
+
+  /* Checklist */
+  .checklist-category {
+    font-size: 11px; font-weight: 700; color: #8a6030;
+    letter-spacing: 1px; margin-bottom: 10px; margin-top: 20px;
+    font-family: sans-serif; text-transform: uppercase;
+  }
+  .check-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .check-item.unchecked { background: #f8f4ee; border: 1px solid #e8dcc8; }
+  .check-item.checked { background: #f0f8e8; border: 1px solid #c8dca8; }
+  .check-box {
+    min-width: 20px; height: 20px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #fff; flex-shrink: 0; transition: all 0.2s;
+  }
+  .check-box.unchecked { border: 2px solid #c8a878; background: transparent; }
+  .check-box.checked { border: 2px solid #5a7a3a; background: #5a7a3a; }
+  .check-label { font-size: 13px; line-height: 1.6; font-family: sans-serif; transition: all 0.2s; }
+  .check-label.unchecked { color: #2a1f0e; }
+  .check-label.checked { color: #5a7a3a; text-decoration: line-through; }
+  .checklist-counter { text-align: center; margin-top: 8px; font-size: 12px; color: #b09070; font-family: sans-serif; }
+  .add-item-row { margin-top: 16px; display: flex; gap: 8px; align-items: center; }
+  .add-input {
+    flex: 1; background: #f8f4ee; border: 1.5px dashed #c8a878;
+    border-radius: 8px; padding: 10px 14px; color: #2a1f0e;
+    font-size: 13px; outline: none; font-family: sans-serif; direction: rtl;
+  }
+  .btn-add {
+    background: #8a6030; color: #fff; border: none;
+    border-radius: 8px; padding: 10px 16px; font-size: 13px;
+    font-weight: 700; cursor: pointer; font-family: sans-serif; white-space: nowrap;
+  }
+  .custom-item-row {
+    display: flex; gap: 10px; align-items: center;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;
+  }
+  .btn-delete {
+    background: transparent; border: none; color: #c8a878;
+    cursor: pointer; font-size: 16px; padding: 0 2px; line-height: 1;
+  }
+
+  /* Archive */
+  .archive-entry {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 8px;
+    background: #f8f4ee; border: 1px solid #e8dcc8;
+  }
+  .archive-name { font-weight: 700; color: #2a1f0e; font-size: 14px; }
+  .archive-meta { font-size: 12px; color: #9a8060; font-family: sans-serif; margin-top: 2px; }
+  .archive-btns { display: flex; gap: 8px; }
+  .btn-open {
+    background: #8a6030; color: #fff; border: none;
+    border-radius: 7px; padding: 6px 14px; font-size: 12px;
+    cursor: pointer; font-family: sans-serif; font-weight: 600;
+  }
+  .btn-del {
+    background: transparent; color: #c8a878; border: 1px solid #e8dcc8;
+    border-radius: 7px; padding: 6px 10px; font-size: 13px; cursor: pointer;
+  }
+
+  /* Guest header in result */
+  .guest-header {
+    background: #fff; border: 1px solid #e8dcc8; border-radius: 14px;
+    padding: 20px 24px; margin-bottom: 20px;
+    box-shadow: 0 4px 24px rgba(139,96,48,0.06);
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .guest-name { font-size: 20px; font-weight: 700; color: #2a1f0e; margin-bottom: 4px; }
+  .guest-title-text { font-size: 13px; color: #9a8060; font-style: italic; }
+  .guest-meta { font-size: 12px; color: #b09070; margin-top: 4px; font-family: sans-serif; }
+  .thumbnail-box { background: #f5efe5; border-radius: 10px; padding: 10px 14px; text-align: center; }
+  .thumbnail-label { font-size: 10px; color: #b09070; letter-spacing: 1px; font-family: sans-serif; }
+  .thumbnail-text { font-size: 15px; font-weight: 700; color: #8a6030; margin-top: 4px; }
+
+  /* Segment box */
+  .segment-box { border: 1px solid #e8dcc8; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+
+  /* Loading */
+  .loading-overlay {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 60px 20px; gap: 16px;
+  }
+  .spinner {
+    width: 40px; height: 40px; border: 3px solid #e8dcc8;
+    border-top-color: #8a6030; border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-in { animation: fadeIn 0.4s ease; }
+
+  .error-msg { color: #c0392b; text-align: center; margin-top: 16px; font-size: 13px; font-family: sans-serif; }
+  .reset-btn {
+    background: transparent; color: #b09070; border: none;
+    font-size: 13px; cursor: pointer; font-family: sans-serif;
+  }
+
+  ::-webkit-scrollbar { height: 4px; width: 4px; }
+  ::-webkit-scrollbar-track { background: #f0e8d8; }
+  ::-webkit-scrollbar-thumb { background: #c8a878; border-radius: 4px; }
+
+  @media (max-width: 600px) {
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .steps { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-sub">גב אל גב • THERAPOINT</div>
+    <h1>הכנה לראיון</h1>
+    <p>מלא את הפרטים — קבל את כל ההכנה לראיון</p>
+    <button class="btn-archive" id="archiveToggle" onclick="toggleArchive()" style="display:none">
+      📁 ארכיון ראיונות (<span id="archiveCount">0</span>)
+    </button>
+  </div>
+
+  <!-- Archive panel -->
+  <div id="archivePanel" style="display:none" class="card">
+    <div class="section-title">ראיונות שמורים</div>
+    <div id="archiveList"></div>
+  </div>
+
+  <!-- Form view -->
+  <div id="formView">
+    <!-- Steps -->
+    <div class="steps" id="stepsIndicator"></div>
+
+    <!-- Form card -->
+    <div class="card" id="formCard">
+      <!-- Step 0 -->
+      <div id="step0" class="form-grid">
+        <div>
+          <label>שם המרואיין/ת *</label>
+          <input id="f_name" placeholder="שם מלא" oninput="checkStep()">
+        </div>
+        <div>
+          <label>תפקיד / תואר</label>
+          <input id="f_title" placeholder='למשל: "מטפלת ברפואת תדרים"'>
+        </div>
+        <div>
+          <label>תחום התמחות *</label>
+          <input id="f_expertise" placeholder='למשל: "קולנים טיפוליים"' oninput="checkStep()">
+        </div>
+        <div>
+          <label>רקע קצר (אופציונלי)</label>
+          <textarea id="f_bio" placeholder="כמה משפטים על הרקע והניסיון"></textarea>
+        </div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="step1" class="form-grid" style="display:none">
+        <div>
+          <label>נושא הראיון *</label>
+          <input id="f_topic" placeholder='למשל: "האם קולנים יכולים לעזור לכאב כרוני?"' oninput="checkStep()">
+        </div>
+        <div>
+          <label>זווית / גישה</label>
+          <input id="f_angle" placeholder='למשל: "בין ספקן מסקרן לפתוח לחלוטין"'>
+        </div>
+        <div>
+          <label>מטרה עיקרית *</label>
+          <input id="f_goal_primary" placeholder='למשל: "לתת לקהל כלי מעשי חדש"' oninput="checkStep()">
+        </div>
+        <div>
+          <label>מטרה משנית</label>
+          <input id="f_goal_secondary" placeholder='למשל: "לחזק את הסמכות שלי"'>
+        </div>
+        <div>
+          <label>קהל יעד ספציפי</label>
+          <select id="f_audience" onchange="toggleAudienceOther()">
+            <option value="סובלים מכאבי גב כרוניים">סובלים מכאבי גב כרוניים</option>
+            <option value="אחר">אחר</option>
+          </select>
+          <input id="f_audience_other" placeholder="תאר את הקהל הספציפי" style="display:none;margin-top:8px">
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="step2" class="form-grid" style="display:none">
+        <div class="form-grid-2">
+          <div>
+            <label>משך הראיון (דקות)</label>
+            <input id="f_duration" type="number" value="45">
+          </div>
+          <div>
+            <label>פורמט</label>
+            <select id="f_format" onchange="toggleFormatOther()">
+              <option value="זום">זום</option>
+              <option value="אחר">אחר</option>
+            </select>
+            <input id="f_format_other" placeholder="תאר את הפורמט" style="display:none;margin-top:8px">
+          </div>
+        </div>
+        <div>
+          <label>הערות נוספות</label>
+          <textarea id="f_notes" placeholder="רגישויות, הסכמות מראש, נושאים לא לגעת בהם" style="min-height:100px"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+      <button class="btn-secondary" id="btnBack" onclick="prevStep()" style="display:none">← חזור</button>
+      <div></div>
+      <button class="btn-primary" id="btnNext" onclick="nextStep()" disabled>המשך ←</button>
+    </div>
+    <div class="error-msg" id="errorMsg" style="display:none"></div>
+  </div>
+
+  <!-- Result view -->
+  <div id="resultView" style="display:none" class="fade-in">
+    <!-- Guest header -->
+    <div class="guest-header">
+      <div>
+        <div class="guest-name" id="r_name"></div>
+        <div class="guest-title-text" id="r_title"></div>
+        <div class="guest-meta" id="r_meta"></div>
+      </div>
+      <div class="thumbnail-box">
+        <div class="thumbnail-label">תאמבנייל</div>
+        <div class="thumbnail-text" id="r_thumbnail"></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabsBar"></div>
+
+    <!-- Section content -->
+    <div class="section-card" id="sectionContent"></div>
+
+    <!-- Reset -->
+    <div style="text-align:center;margin-top:16px">
+      <button class="reset-btn" onclick="resetAll()">← ראיון חדש</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SYSTEM_PROMPT = `אתה עוזר מקצועי של שלומי חמי, מטפל טבעי ומדקר עם מעל 20 שנות ניסיון. הקליניקה נקראת Therapoint בכפר סבא. שלומי מתמחה בדיקורתופדי — שיטה המשלבת טיפול פיזי עם עבודה רגשית ותת-מודעת. הפרויקט נקרא "גב אל גב". הקהל: אנשים שסובלים מכאבי גב, צוואר ואגן, גילאי 30-65, מחפשים פתרון טבעי.
+
+שלומי מנהל ראיון כמוביל שיחה — לא מראיין פסיבי, לא דומיננטי לגמרי. הוא שואל שאלות חדות, מביע דעה משלו, ומחבר בין עולם האורח לעולם שלו.
+
+קבל פרטי מרואיין ומטרות הראיון, והחזר JSON בלבד ללא backticks:
+
+{
+  "title_options": ["כותרת 1", "כותרת 2", "כותרת 3"],
+  "thumbnail_text": "טקסט תאמבנייל עד 6 מילים",
+  "pre_call_script": "סקריפט מפורט לשיחה המקדימה — מה שלומי אומר, שואל ומבקש. כולל פתיחה חמה, הסבר על הפרויקט והקהל, תיאום ציפיות, שאלות להכרת המרואיין לעומק, ובקשות ספציפיות. כתוב כשיחה אמיתית.",
+  "pre_call_requests": ["בקשה ספציפית 1", "בקשה 2", "בקשה 3"],
+  "opening": "פתיחה לראיון עצמו (2-3 משפטים)",
+  "outline": [
+    {"segment": "שם", "duration": "X דקות", "goal": "מטרה", "questions": ["שאלה 1", "שאלה 2", "שאלה 3"]},
+    {"segment": "שם", "duration": "X דקות", "goal": "מטרה", "questions": ["שאלה 1", "שאלה 2"]},
+    {"segment": "שם", "duration": "X דקות", "goal": "מטרה", "questions": ["שאלה 1", "שאלה 2"]},
+    {"segment": "שם", "duration": "X דקות", "goal": "מטרה", "questions": ["שאלה 1", "שאלה 2"]},
+    {"segment": "סיום", "duration": "2-3 דקות", "goal": "סגירה חזקה", "questions": ["שאלה סיום"]}
+  ],
+  "shlomi_angles": ["זווית 1", "זווית 2", "זווית 3"],
+  "caution_points": ["נקודת זהירות 1", "נקודת זהירות 2"],
+  "closing_note": "מה הכי חשוב שיצא מהראיון"
+}`;
+
+const STEPS_DEF = [
+  { label: "פרטי האורח" },
+  { label: "נושא ומטרות" },
+  { label: "הקשר נוסף" },
+];
+
+const TABS_DEF = [
+  { id: "precall", label: "📞 שיחה מקדימה" },
+  { id: "checklist", label: "✅ צ'ק ליסט" },
+  { id: "outline", label: "📐 מבנה הראיון" },
+  { id: "titles", label: "✍️ כותרות" },
+  { id: "angles", label: "💡 הזוויות שלי" },
+  { id: "caution", label: "⚠️ דגשים" },
+];
+
+let currentStep = 0;
+let currentTab = "precall";
+let result = null;
+let currentForm = {};
+let checkedItems = {};
+let customItems = [];
+let archive = JSON.parse(localStorage.getItem("interview_archive") || "[]");
+
+// Init
+renderSteps();
+renderArchiveBtn();
+
+function renderSteps() {
+  const c = document.getElementById("stepsIndicator");
+  c.innerHTML = STEPS_DEF.map((s, i) => {
+    const cls = i < currentStep ? "done" : i === currentStep ? "active" : "inactive";
+    const lbl = i < currentStep ? "active" : i === currentStep ? "active" : "inactive";
+    const inner = i < currentStep ? "✓" : i + 1;
+    const line = i < STEPS_DEF.length - 1 ? '<div class="step-line"></div>' : "";
+    return `<div class="step-circle ${cls}">${inner}</div><span class="step-label ${lbl}">${s.label}</span>${line}`;
+  }).join("");
+}
+
+function checkStep() {
+  const btn = document.getElementById("btnNext");
+  if (currentStep === 0) {
+    btn.disabled = !(v("f_name") && v("f_expertise"));
+  } else if (currentStep === 1) {
+    btn.disabled = !(v("f_topic") && v("f_goal_primary"));
+  } else {
+    btn.disabled = false;
+  }
+}
+
+function v(id) { return document.getElementById(id)?.value?.trim() || ""; }
+
+function nextStep() {
+  if (currentStep < 2) {
+    document.getElementById("step" + currentStep).style.display = "none";
+    currentStep++;
+    document.getElementById("step" + currentStep).style.display = "";
+    document.getElementById("btnBack").style.display = "";
+    if (currentStep === 2) {
+      document.getElementById("btnNext").textContent = "✦ צור הכנה לראיון";
+      document.getElementById("btnNext").onclick = generate;
+      document.getElementById("btnNext").disabled = false;
+    }
+    renderSteps();
+    checkStep();
+  }
+}
+
+function prevStep() {
+  document.getElementById("step" + currentStep).style.display = "none";
+  currentStep--;
+  document.getElementById("step" + currentStep).style.display = "";
+  if (currentStep === 0) document.getElementById("btnBack").style.display = "none";
+  document.getElementById("btnNext").textContent = "המשך ←";
+  document.getElementById("btnNext").onclick = nextStep;
+  renderSteps();
+  checkStep();
+}
+
+function toggleAudienceOther() {
+  const sel = document.getElementById("f_audience").value;
+  document.getElementById("f_audience_other").style.display = sel === "אחר" ? "" : "none";
+}
+
+function toggleFormatOther() {
+  const sel = document.getElementById("f_format").value;
+  document.getElementById("f_format_other").style.display = sel === "אחר" ? "" : "none";
+}
+
+async function generate() {
+  const btn = document.getElementById("btnNext");
+  btn.disabled = true;
+  btn.textContent = "⏳ מכין את הראיון...";
+  document.getElementById("errorMsg").style.display = "none";
+
+  const audience = v("f_audience") === "אחר" ? v("f_audience_other") || "לא צוין" : v("f_audience");
+  const format = v("f_format") === "אחר" ? v("f_format_other") || "לא צוין" : v("f_format");
+
+  currentForm = {
+    name: v("f_name"), title: v("f_title"), expertise: v("f_expertise"), bio: v("f_bio"),
+    topic: v("f_topic"), angle: v("f_angle"), audience, goal_primary: v("f_goal_primary"),
+    goal_secondary: v("f_goal_secondary"), duration: v("f_duration") || "45", format, notes: v("f_notes"),
+  };
+
+  const prompt = `פרטי המרואיין:
+שם: ${currentForm.name}
+תפקיד: ${currentForm.title}
+התמחות: ${currentForm.expertise}
+רקע: ${currentForm.bio}
+נושא: ${currentForm.topic}
+זווית: ${currentForm.angle}
+קהל: ${currentForm.audience}
+מטרה עיקרית: ${currentForm.goal_primary}
+מטרה משנית: ${currentForm.goal_secondary}
+משך: ${currentForm.duration} דקות
+פורמט: ${currentForm.format}
+הערות: ${currentForm.notes || "אין"}
+החזר JSON בלבד.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5",
+        max_tokens: 4000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    if (!res.ok) { const e = await res.json(); throw new Error(e?.error?.message || `HTTP ${res.status}`); }
+    const data = await res.json();
+    const text = data.content?.map(b => b.text || "").join("") || "";
+    result = JSON.parse(text.replace(/```json|```/g, "").trim());
+    saveToArchive(result, currentForm);
+    showResult();
+  } catch (e) {
+    document.getElementById("errorMsg").textContent = `שגיאה: ${e.message}`;
+    document.getElementById("errorMsg").style.display = "";
+    btn.disabled = false;
+    btn.textContent = "✦ צור הכנה לראיון";
+  }
+}
+
+function saveToArchive(r, f) {
+  const entry = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString("he-IL"),
+    name: f.name, topic: f.topic, form: f, result: r,
+  };
+  archive = [entry, ...archive].slice(0, 20);
+  localStorage.setItem("interview_archive", JSON.stringify(archive));
+  renderArchiveBtn();
+}
+
+function renderArchiveBtn() {
+  const btn = document.getElementById("archiveToggle");
+  const cnt = document.getElementById("archiveCount");
+  if (archive.length > 0) {
+    btn.style.display = "";
+    cnt.textContent = archive.length;
+  } else {
+    btn.style.display = "none";
+  }
+}
+
+function toggleArchive() {
+  const panel = document.getElementById("archivePanel");
+  const btn = document.getElementById("archiveToggle");
+  const open = panel.style.display === "none";
+  panel.style.display = open ? "" : "none";
+  btn.classList.toggle("active", open);
+  if (open) renderArchiveList();
+}
+
+function renderArchiveList() {
+  const list = document.getElementById("archiveList");
+  if (archive.length === 0) { list.innerHTML = '<div style="color:#b09070;font-size:13px;font-family:sans-serif">אין ראיונות שמורים</div>'; return; }
+  list.innerHTML = archive.map(e => `
+    <div class="archive-entry">
+      <div>
+        <div class="archive-name">${e.name}</div>
+        <div class="archive-meta">${e.topic} • ${e.date}</div>
+      </div>
+      <div class="archive-btns">
+        <button class="btn-open" onclick="loadFromArchive(${e.id})">פתח</button>
+        <button class="btn-del" onclick="deleteFromArchive(${e.id})">×</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function loadFromArchive(id) {
+  const entry = archive.find(e => e.id === id);
+  if (!entry) return;
+  currentForm = entry.form;
+  result = entry.result;
+  checkedItems = {};
+  customItems = [];
+  document.getElementById("archivePanel").style.display = "none";
+  document.getElementById("archiveToggle").classList.remove("active");
+  showResult();
+}
+
+function deleteFromArchive(id) {
+  archive = archive.filter(e => e.id !== id);
+  localStorage.setItem("interview_archive", JSON.stringify(archive));
+  renderArchiveBtn();
+  renderArchiveList();
+}
+
+function showResult() {
+  document.getElementById("formView").style.display = "none";
+  const rv = document.getElementById("resultView");
+  rv.style.display = "";
+  rv.classList.add("fade-in");
+
+  document.getElementById("r_name").textContent = currentForm.name;
+  document.getElementById("r_title").textContent = currentForm.title || "";
+  document.getElementById("r_meta").textContent = `${currentForm.duration} דקות • ${currentForm.format}`;
+  document.getElementById("r_thumbnail").textContent = result.thumbnail_text || "";
+
+  // Tabs
+  const tabsBar = document.getElementById("tabsBar");
+  tabsBar.innerHTML = TABS_DEF.map(t =>
+    `<button class="tab ${t.id === currentTab ? 'active' : ''}" onclick="switchTab('${t.id}')">${t.label}</button>`
+  ).join("");
+
+  renderSection(currentTab);
+}
+
+function switchTab(id) {
+  currentTab = id;
+  document.querySelectorAll(".tab").forEach(t => {
+    t.classList.toggle("active", t.textContent.includes(TABS_DEF.find(d => d.id === id)?.label?.slice(2)));
+  });
+  // re-render tabs to update active
+  const tabsBar = document.getElementById("tabsBar");
+  tabsBar.innerHTML = TABS_DEF.map(t =>
+    `<button class="tab ${t.id === currentTab ? 'active' : ''}" onclick="switchTab('${t.id}')">${t.label}</button>`
+  ).join("");
+  renderSection(id);
+}
+
+function copyText(text, btnId) {
+  navigator.clipboard.writeText(text).catch(() => {});
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.textContent = "✓ הועתק";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "העתק"; btn.classList.remove("copied"); }, 2000);
+  }
+}
+
+function renderSection(id) {
+  const el = document.getElementById("sectionContent");
+  if (id === "precall") {
+    el.innerHTML = `
+      <div class="section-title">סקריפט לשיחה המקדימה עם ${currentForm.name}</div>
+      <div style="font-size:12px;color:#9a8060;margin-bottom:14px;font-style:italic;font-family:sans-serif">זוהי שיחה פרטית בינך לבינה — הכנה וסנכרון לפני הראיון עצמו</div>
+      <div class="text-block">${escHtml(result.pre_call_script)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 10px">
+        <div style="font-size:12px;font-weight:700;color:#9a8060;font-family:sans-serif;letter-spacing:0.5px">בקשות ספציפיות ממנה</div>
+        <button class="btn-copy" id="btnCopyPrecall" onclick="copyText(${JSON.stringify(result.pre_call_script)}, 'btnCopyPrecall')">העתק</button>
+      </div>
+      ${result.pre_call_requests.map((r,i) => `
+        <div class="request-row">
+          <div class="num-circle">${i+1}</div>
+          <div style="font-size:14px;color:#2a1f0e;line-height:1.7">${escHtml(r)}</div>
+        </div>`).join("")}
+      <div class="opening-block">
+        <div class="opening-label">פתיחה לראיון עצמו</div>
+        ${escHtml(result.opening)}
+      </div>`;
+  } else if (id === "checklist") {
+    const groups = [
+      { id: "photo", cat: "תמונה ותדמית", items: [
+        `בקש תמונה מקצועית של ${currentForm.name} ברזולוציה גבוהה (לתאמבנייל)`,
+        "שאל אם יש לוגו שניתן להוסיף",
+      ]},
+      { id: "intro", cat: "הצגה ואשרור", items: [
+        `אשר איך ${currentForm.name} רוצה שיציגו אותו/ה — בדיוק`,
+      ]},
+      { id: "tech", cat: "טכני (זום)", items: [
+        "ודא שיש מיקרופון איכותי / אוזניות",
+        "ודא תאורה טובה מלפנים (לא מאחור)",
+        "בקש רקע נקי או מקצועי",
+        "שלח לינק זום מראש וודא שהוא עובד",
+      ]},
+      { id: "content", cat: "תוכן ואישורים", items: [
+        "הסבר על הקהל — מה הם מחפשים ומה יעזור להם",
+        "שאל האם יש נושאים שאין לגעת בהם",
+        `הסכם על משך הראיון — ${currentForm.duration} דקות`,
+        "שאל האם רוצה לראות את השאלות מראש",
+        "קבל אישור לפרסום הוידאו בפייסבוק וביוטיוב",
+      ]},
+      { id: "post", cat: "אחרי הראיון", items: [
+        `שלח ל${currentForm.name} קישור לוידאו כשעולה`,
+        "בקש שיגיד על הוידאו ברשתות שלו/ה",
+        "שמור קשר לשיתופי פעולה עתידיים",
+      ]},
+    ];
+    const total = groups.reduce((s, g) => s + g.items.length, 0) + customItems.length;
+    const done = Object.values(checkedItems).filter(Boolean).length;
+
+    el.innerHTML = `
+      ${groups.map(g => `
+        <div class="checklist-category">${g.cat}</div>
+        ${g.items.map((item, i) => {
+          const key = `${g.id}_${i}`;
+          const ch = !!checkedItems[key];
+          return `<div class="check-item ${ch ? 'checked' : 'unchecked'}" onclick="toggleCheck('${key}')">
+            <div class="check-box ${ch ? 'checked' : 'unchecked'}">${ch ? '✓' : ''}</div>
+            <span class="check-label ${ch ? 'checked' : 'unchecked'}">${escHtml(item)}</span>
+          </div>`;
+        }).join("")}`).join("")}
+
+      ${customItems.length > 0 ? `
+        <div class="checklist-category">משימות נוספות</div>
+        ${customItems.map((item, i) => {
+          const key = `custom_${i}`;
+          const ch = !!checkedItems[key];
+          return `<div class="custom-item-row ${ch ? 'checked' : 'unchecked'} check-item" style="border:1px solid ${ch ? '#c8dca8' : '#e8dcc8'}">
+            <div class="check-box ${ch ? 'checked' : 'unchecked'}" onclick="toggleCheck('${key}')">${ch ? '✓' : ''}</div>
+            <span class="check-label ${ch ? 'checked' : 'unchecked'}" onclick="toggleCheck('${key}')" style="flex:1">${escHtml(item)}</span>
+            <button class="btn-delete" onclick="removeCustomItem(${i})">×</button>
+          </div>`;
+        }).join("")}
+      ` : ""}
+
+      <div class="checklist-counter">${done} / ${total} הושלמו</div>
+      <div class="add-item-row">
+        <input class="add-input" id="newItemInput" placeholder="+ הוסף משימה..." onkeydown="if(event.key==='Enter')addCustomItem()">
+        <button class="btn-add" onclick="addCustomItem()">הוסף</button>
+      </div>`;
+  } else if (id === "outline") {
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+        <div class="section-title" style="margin:0">מבנה הראיון — ${currentForm.duration} דקות</div>
+        <button class="btn-copy" id="btnCopyOutline" onclick="copyText(${JSON.stringify(result.outline.map(s=>`${s.segment} (${s.duration})\n${s.questions.join('\n')}`).join('\n\n'))}, 'btnCopyOutline')">העתק הכל</button>
+      </div>
+      ${result.outline.map(seg => `
+        <div class="segment-box">
+          <div class="segment-header">
+            <div style="display:flex;align-items:center">
+              <span class="segment-time">${seg.duration}</span>
+              <span class="segment-name">${escHtml(seg.segment)}</span>
+            </div>
+            <span class="segment-goal">${escHtml(seg.goal)}</span>
+          </div>
+          <div class="segment-body">
+            ${seg.questions.map(q => `
+              <div class="question-row">
+                <span class="q-arrow">›</span>
+                <span class="q-text">${escHtml(q)}</span>
+              </div>`).join("")}
+          </div>
+        </div>`).join("")}`;
+  } else if (id === "titles") {
+    el.innerHTML = `
+      <div class="section-title">3 אפשרויות לכותרת</div>
+      ${result.title_options.map((t, i) => `
+        <div class="title-option">
+          <div style="font-size:15px;color:#2a1f0e;font-weight:${i===0?700:400}">
+            ${i===0 ? '<span style="color:#8a6030;font-size:11px;font-family:sans-serif;margin-left:8px">מומלץ</span>' : ""}
+            ${escHtml(t)}
+          </div>
+          <button class="btn-copy" id="btnCopyTitle${i}" onclick="copyText(${JSON.stringify(t)}, 'btnCopyTitle${i}')">העתק</button>
+        </div>`).join("")}`;
+  } else if (id === "angles") {
+    el.innerHTML = `
+      <div class="section-title">איפה שלומי מוסיף את הקול שלו</div>
+      ${result.shlomi_angles.map(a => `<div class="angle-block">${escHtml(a)}</div>`).join("")}
+      <div class="closing-block">
+        <div class="closing-label">הערה לסיום</div>
+        <div style="font-size:13px;color:#3a5a2a;line-height:1.7">${escHtml(result.closing_note)}</div>
+      </div>`;
+  } else if (id === "caution") {
+    el.innerHTML = `
+      <div class="section-title">מה לשים לב אליו בראיון הזה</div>
+      ${result.caution_points.map(c => `
+        <div class="caution-block">
+          <span style="font-size:18px">⚠️</span>
+          <span style="font-size:14px;color:#2a1f0e;line-height:1.7">${escHtml(c)}</span>
+        </div>`).join("")}`;
+  }
+}
+
+function toggleCheck(key) {
+  checkedItems[key] = !checkedItems[key];
+  renderSection("checklist");
+}
+
+function addCustomItem() {
+  const inp = document.getElementById("newItemInput");
+  const val = inp?.value?.trim();
+  if (val) { customItems.push(val); inp.value = ""; renderSection("checklist"); }
+}
+
+function removeCustomItem(i) {
+  customItems.splice(i, 1);
+  renderSection("checklist");
+}
+
+function resetAll() {
+  currentStep = 0;
+  result = null;
+  currentForm = {};
+  checkedItems = {};
+  customItems = [];
+  currentTab = "precall";
+
+  document.getElementById("resultView").style.display = "none";
+  document.getElementById("formView").style.display = "";
+  document.getElementById("archivePanel").style.display = "none";
+  document.getElementById("archiveToggle").classList.remove("active");
+
+  ["f_name","f_title","f_expertise","f_bio","f_topic","f_angle","f_goal_primary","f_goal_secondary","f_notes"].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = "";
+  });
+  document.getElementById("f_duration").value = "45";
+  document.getElementById("f_audience").value = "סובלים מכאבי גב כרוניים";
+  document.getElementById("f_format").value = "זום";
+  document.getElementById("f_audience_other").style.display = "none";
+  document.getElementById("f_format_other").style.display = "none";
+
+  document.getElementById("step0").style.display = "";
+  document.getElementById("step1").style.display = "none";
+  document.getElementById("step2").style.display = "none";
+  document.getElementById("btnBack").style.display = "none";
+  document.getElementById("btnNext").textContent = "המשך ←";
+  document.getElementById("btnNext").onclick = nextStep;
+  document.getElementById("btnNext").disabled = true;
+  document.getElementById("errorMsg").style.display = "none";
+  renderSteps();
+}
+
+function escHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/\n/g,"<br>");
+}
+</script>
+</body>
+</html>
